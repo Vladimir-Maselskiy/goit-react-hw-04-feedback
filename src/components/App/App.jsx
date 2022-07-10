@@ -1,58 +1,57 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import FeedbackOptions from '../FeedbackOptions/FeedbackOptions';
 import Statistics from '../Statistics/Statistics';
 import Section from '../Section/Section';
 import { countTotalFeedback } from 'utils/countTotalFeedback';
 import { countPositiveFeedbackPercentage } from 'utils/countPositiveFeedbackPercentage';
 import { Container } from './App.styled';
-import { capitalizeName } from 'utils/capitalizeName';
 
-export default class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export default function App() {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  handlerButtonClick = event => {
-    this.setState(prevState => {
-      let name = event.target.name.toLowerCase();
-      return { [name]: prevState[name] + 1 };
-    });
-  };
+  const options = { good, neutral, bad };
 
-  getKeysInLoweCase() {
-    const keysOriginalCase = Object.keys(this.state);
-    return keysOriginalCase.map(key => capitalizeName(key));
+  function handlerButtonClick(event) {
+    let name = event.target.name.toLowerCase();
+    switch (name) {
+      case 'good':
+        return setGood(good + 1);
+
+      case 'neutral':
+        return setNeutral(neutral + 1);
+
+      case 'bad':
+        return setBad(bad + 1);
+
+      default:
+        return null;
+    }
   }
 
-  render() {
-    const { good, neutral, bad } = this.state;
-    return (
-      <Container>
-        React homework template
-        <Section
-          title="Please leave feedback"
-          children={
-            <FeedbackOptions
-              options={this.getKeysInLoweCase()}
-              onClick={this.handlerButtonClick}
-            />
-          }
-        />
-        <Section
-          title="Statistics"
-          children={
-            <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={countTotalFeedback(this.state)}
-              positivePercentage={countPositiveFeedbackPercentage(this.state)}
-            />
-          }
-        />
-      </Container>
-    );
+  function getFeedbackValue() {
+    return ['Good', 'Neutral', 'Bad'];
   }
+
+  return (
+    <Container>
+      React homework template
+      <Section title="Please leave feedback">
+        <FeedbackOptions
+          options={getFeedbackValue()}
+          onClick={handlerButtonClick}
+        />
+      </Section>
+      <Section title="Statistics">
+        <Statistics
+          good={good}
+          neutral={neutral}
+          bad={bad}
+          total={countTotalFeedback(options)}
+          positivePercentage={countPositiveFeedbackPercentage(options)}
+        />
+      </Section>
+    </Container>
+  );
 }
